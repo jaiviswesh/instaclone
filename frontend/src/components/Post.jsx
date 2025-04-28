@@ -33,7 +33,7 @@ const Post = ({ post }) => {
     const likeOrDislikeHandler = async () => {
         try {
             const action = liked ? 'dislike' : 'like';
-            const res = await axios.get(`http://localhost:8000/api/v1/post/${post._id}/${action}`, { withCredentials: true });
+            const res = await axios.get(`https://instaclone-xgj5.onrender.com/api/v1/post/${post._id}/${action}`, { withCredentials: true });
             console.log(res.data);
             if (res.data.success) {
                 const updatedLikes = liked ? postLike - 1 : postLike + 1;
@@ -58,7 +58,7 @@ const Post = ({ post }) => {
     const commentHandler = async () => {
 
         try {
-            const res = await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`, { text }, {
+            const res = await axios.post(`https://instaclone-xgj5.onrender.com/api/v1/post/${post._id}/comment`, { text }, {
                 headers: {
                     'Content-Type': 'application/json'
                 },
