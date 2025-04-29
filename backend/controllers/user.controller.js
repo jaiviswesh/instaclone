@@ -166,17 +166,17 @@ export const getSuggestedUsers = async (req, res) => {
 };
 export const followOrUnfollow = async (req, res) => {
     try {
-        const followKrneWala = req.id; // patel
-        const jiskoFollowKrunga = req.params.id; // shivani
-        if (followKrneWala === jiskoFollowKrunga) {
+        const f0 = req.id; 
+        const f1 = req.params.id; 
+        if (f0 === f1) {
             return res.status(400).json({
                 message: 'You cannot follow/unfollow yourself',
                 success: false
             });
         }
 
-        const user = await User.findById(followKrneWala);
-        const targetUser = await User.findById(jiskoFollowKrunga);
+        const user = await User.findById(f0);
+        const targetUser = await User.findById(f1);
 
         if (!user || !targetUser) {
             return res.status(400).json({
@@ -184,17 +184,17 @@ export const followOrUnfollow = async (req, res) => {
                 success: false
             });
         }
-        const isFollowing = user.following.includes(jiskoFollowKrunga);
+        const isFollowing = user.following.includes(f1);
         if (isFollowing) {
             await Promise.all([
-                User.updateOne({ _id: followKrneWala }, { $pull: { following: jiskoFollowKrunga } }),
-                User.updateOne({ _id: jiskoFollowKrunga }, { $pull: { followers: followKrneWala } }),
+                User.updateOne({ _id: f0 }, { $pull: { following: f1 } }),
+                User.updateOne({ _id: f1 }, { $pull: { followers: f0 } }),
             ])
             return res.status(200).json({ message: 'Unfollowed successfully', success: true });
         } else {
             await Promise.all([
-                User.updateOne({ _id: followKrneWala }, { $push: { following: jiskoFollowKrunga } }),
-                User.updateOne({ _id: jiskoFollowKrunga }, { $push: { followers: followKrneWala } }),
+                User.updateOne({ _id: f0 }, { $push: { following: f1 } }),
+                User.updateOne({ _id: f1 }, { $push: { followers: f0 } }),
             ])
             return res.status(200).json({ message: 'followed successfully', success: true });
         }
