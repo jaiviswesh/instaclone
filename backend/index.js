@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
 const corsOptions = {
-    origin: "https://instaclone-xgj5.onrender.com",
+    origin: "https://instaclone-xgj5.onrender.com/5173",
     credentials: true
 }
 app.use(cors(corsOptions));

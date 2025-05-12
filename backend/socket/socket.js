@@ -8,7 +8,7 @@ const server = http.createServer(app);
 
 const io = new Server(server, {
     cors:{
-        origin:"https://instaclone-xgj5.onrender.com",
+        origin:"https://instaclone-xgj5.onrender.com/5173",
         methods:['GET','POST']
     }
 })
