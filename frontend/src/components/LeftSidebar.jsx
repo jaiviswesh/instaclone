@@ -32,6 +32,7 @@ const LeftSidebar = () => {
             }
         } catch (error) {
             toast.error(error.response.data.message);
+            console.log("hi");
         }
     }
 
