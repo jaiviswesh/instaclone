@@ -13,7 +13,8 @@ const ForgotPassword = () => {
         try {
             setLoading(true);
             const res = await axios.post('https://instaclone-xgj5.onrender.com/api/v1/user/forgot-password', { email }, {
-                headers: { 'Content-Type': 'application/json' }
+                headers: { 'Content-Type': 'application/json' },
+                withCredentials: true
             });
             if (res.data.success) {
                 toast.success(res.data.message);

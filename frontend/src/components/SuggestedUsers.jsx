@@ -2,9 +2,23 @@ import React from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import axios from "axios";
+import { toast } from "sonner";
 
 const SuggestedUsers = () => {
     const { suggestedUsers } = useSelector(store => store.auth);
+
+    const followHandler = async (userId) => {
+        try {
+            const res = await axios.post(`https://instaclone-xgj5.onrender.com/api/v1/user/followorunfollow/${userId}`, {}, { withCredentials: true });
+            if (res.data.success) {
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Something went wrong");
+        }
+    };
+
     return (
         <div className='my-10'>
             <div className='flex items-center justify-between text-sm'>
@@ -26,14 +40,18 @@ const SuggestedUsers = () => {
                                     <span className='text-gray-600 text-sm'>{user?.bio || 'Bio here...'}</span>
                                 </div>
                             </div>
-                            <span className='text-[#3BADF8] text-xs font-bold cursor-pointer hover:text-[#3495d6]'>Follow</span>
+                            <span
+                                className='text-[#3BADF8] text-xs font-bold cursor-pointer hover:text-[#3495d6]'
+                                onClick={() => followHandler(user._id)}
+                            >
+                                Follow
+                            </span>
                         </div>
                     )
                 })
             }
-
         </div>
     )
 }
 
-export default SuggestedUsers
+export default SuggestedUsers;
