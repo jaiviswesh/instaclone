@@ -11,6 +11,8 @@ const userSchema = new mongoose.Schema({
     following:[{type:mongoose.Schema.Types.ObjectId, ref:'User'}],
     posts:[{type:mongoose.Schema.Types.ObjectId, ref:'Post'}],
     bookmarks:[{type:mongoose.Schema.Types.ObjectId, ref:'Post'}],
-    followersCount: { type: Number, default: 0 }
+    followersCount: { type: Number, default: 0 },
+    followingCount: { type: Number, default: 0 },
+    postsCount: { type: Number, default: 0 },     
 },{timestamps:true});
 export const User = mongoose.model('User', userSchema);

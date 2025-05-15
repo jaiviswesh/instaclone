@@ -188,20 +188,24 @@ export const followOrUnfollow = async (req, res) => {
             });
         }
 
-        const isFollowing = user.following.includes(followeeId);
+        // Increment or decrement followers and following counts
+        const isFollowing = user.followingCount > targetUser.followersCount;
         if (isFollowing) {
-            user.following = user.following.filter(id => id.toString() !== followeeId);
-            targetUser.followers = targetUser.followers.filter(id => id.toString() !== followerId);
+            user.followingCount -= 1;
+            targetUser.followersCount -= 1;
         } else {
-            user.following.push(followeeId);
-            targetUser.followers.push(followerId);
+            user.followingCount += 1;
+            targetUser.followersCount += 1;
         }
 
         await Promise.all([user.save(), targetUser.save()]);
 
         return res.status(200).json({
             message: isFollowing ? 'Unfollowed successfully' : 'Followed successfully',
-            success: true
+            success: true,
+            isFollowing: !isFollowing,
+            followersCount: targetUser.followersCount,
+            followingCount: user.followingCount
         });
     } catch (error) {
         console.log(error);
