@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
 import { Post } from "../models/post.model.js";
+import nodemailer from "nodemailer";
+
 export const register = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -166,39 +168,99 @@ export const getSuggestedUsers = async (req, res) => {
 };
 export const followOrUnfollow = async (req, res) => {
     try {
-        const f0 = req.id; 
-        const f1 = req.params.id; 
-        if (f0 === f1) {
+        const followerId = req.id;
+        const followeeId = req.params.id;
+
+        if (followerId === followeeId) {
             return res.status(400).json({
                 message: 'You cannot follow/unfollow yourself',
                 success: false
             });
         }
 
-        const user = await User.findById(f0);
-        const targetUser = await User.findById(f1);
+        const user = await User.findById(followerId);
+        const targetUser = await User.findById(followeeId);
 
         if (!user || !targetUser) {
-            return res.status(400).json({
+            return res.status(404).json({
                 message: 'User not found',
                 success: false
             });
         }
-        const isFollowing = user.following.includes(f1);
+
+        const isFollowing = user.following.includes(followeeId);
         if (isFollowing) {
-            await Promise.all([
-                User.updateOne({ _id: f0 }, { $pull: { following: f1 } }),
-                User.updateOne({ _id: f1 }, { $pull: { followers: f0 } }),
-            ])
-            return res.status(200).json({ message: 'Unfollowed successfully', success: true });
+            user.following = user.following.filter(id => id.toString() !== followeeId);
+            targetUser.followers = targetUser.followers.filter(id => id.toString() !== followerId);
         } else {
-            await Promise.all([
-                User.updateOne({ _id: f0 }, { $push: { following: f1 } }),
-                User.updateOne({ _id: f1 }, { $push: { followers: f0 } }),
-            ])
-            return res.status(200).json({ message: 'followed successfully', success: true });
+            user.following.push(followeeId);
+            targetUser.followers.push(followerId);
         }
+
+        await Promise.all([user.save(), targetUser.save()]);
+
+        return res.status(200).json({
+            message: isFollowing ? 'Unfollowed successfully' : 'Followed successfully',
+            success: true
+        });
     } catch (error) {
         console.log(error);
+        res.status(500).json({ message: "Internal server error.", success: false });
     }
-}
+};
+
+export const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({
+                message: "Email not found in the database.",
+                success: false,
+            });
+        }
+
+        const token = jwt.sign({ userId: user._id }, "Change2pass", { expiresIn: "1h" });
+
+        const resetLink = `https://instaclone-xgj5.onrender.com/reset-password/${token}`;
+        console.log(`Password reset link: ${resetLink}`); // Replace with actual email sending logic
+
+        return res.status(200).json({
+            message: "Password reset email sent successfully.",
+            success: true,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error.", success: false });
+    }
+};
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { token } = req.params;
+        const { newPassword } = req.body;
+
+        // Verify the token
+        const decoded = jwt.verify(token, "Change2pass");
+        const user = await User.findById(decoded.userId);
+        if (!user) {
+            return res.status(404).json({
+                message: "Invalid or expired token.",
+                success: false,
+            });
+        }
+
+        // Hash the new password and update it
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+        await user.save();
+
+        return res.status(200).json({
+            message: "Password reset successfully.",
+            success: true,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: "Internal server error.", success: false });
+    }
+};

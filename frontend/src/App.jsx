@@ -6,6 +6,7 @@ import Login from './components/Login'
 import MainLayout from './components/MainLayout'
 import Profile from './components/Profile'
 import Signup from './components/Signup'
+import ForgotPassword from './components/ForgotPassword'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { io } from "socket.io-client";
 import { useDispatch, useSelector } from 'react-redux'
@@ -45,6 +46,10 @@ const browserRouter = createBrowserRouter([
   {
     path: '/signup',
     element: <Signup />
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPassword />
   },
 ])
 

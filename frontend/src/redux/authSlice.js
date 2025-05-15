@@ -17,7 +17,10 @@ const authSlice = createSlice({
             state.suggestedUsers = action.payload;
         },
         setUserProfile:(state,action) => {
-            state.userProfile = action.payload;
+            state.userProfile = {
+                ...action.payload,
+                followersCount: action.payload.followersCount || 0,
+            };
         },
         setSelectedUser:(state,action) => {
             state.selectedUser = action.payload;

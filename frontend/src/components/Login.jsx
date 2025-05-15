@@ -113,7 +113,7 @@ const Login = () => {
                     </div>
 
                     <div className="text-center">
-                        <a href="#" className="text-xs text-blue-900">Forgot password?</a>
+                        <Link to="/forgot-password" className="text-xs text-blue-900">Forgot password?</Link>
                     </div>
                 </div>
 
